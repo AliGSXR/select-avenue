@@ -20,6 +20,14 @@ class Order
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
+    /*
+     * 1 : en attente de paiement
+     * 2 : Paiement validé
+     * 3 : Expédié
+     */
+    #[ORM\Column]
+    private ?int $state = null;
+
     #[ORM\Column(length: 255)]
     private ?string $carrierName = null;
 
@@ -32,12 +40,41 @@ class Order
     /**
      * @var Collection<int, OrderDetail>
      */
-    #[ORM\OneToMany(targetEntity: OrderDetail::class, mappedBy: 'myOrder')]
+    #[ORM\OneToMany(targetEntity: OrderDetail::class, mappedBy: 'myOrder', cascade:['persist'])]
     private Collection $orderDetails;
+
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $stripe_session_id = null;
 
     public function __construct()
     {
         $this->orderDetails = new ArrayCollection();
+    }
+
+    public function getTotalWt(){
+        $totalTTC = 0;
+        $products = $this->getOrderDetails();
+        foreach ($products as $product){
+            $coeff = 1 + ($product->getProductTva() / 100);
+            $totalTTC += $product->getProductPrice()*$coeff;
+        }
+        return $totalTTC + $this->getCarrierPrice();
+    }
+
+    public function getTotalTva(){
+        $totalTva = 0;
+
+        $products = $this->getOrderDetails();
+
+        foreach ($products as $product){
+            $coeff = $product->getProductTva() / 100;
+            $totalTva += ($product->getProductPrice()*$coeff) * $product->getProductQuantity();
+        }
+        return $totalTva;
     }
 
     public function getId(): ?int
@@ -57,6 +94,15 @@ class Order
         return $this;
     }
 
+    public function getState(): ?int
+    {
+        return $this->state;
+    }
+
+    public function setState(int $state): int
+    {
+        return $this->state = $state;
+    }
     public function getCarrierName(): ?string
     {
         return $this->carrierName;
@@ -119,6 +165,30 @@ class Order
                 $orderDetail->setMyOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getStripeSessionId(): ?string
+    {
+        return $this->stripe_session_id;
+    }
+
+    public function setStripeSessionId(?string $stripe_session_id): static
+    {
+        $this->stripe_session_id = $stripe_session_id;
 
         return $this;
     }

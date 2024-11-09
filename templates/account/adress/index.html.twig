@@ -30,7 +30,8 @@
                                     {{ adress.city }} {{ adress.country }}<br>
                                     {{ adress.phone }}<br>
                                     <a href="{{ path('app_account_adress_form', {id : adress.id}) }}" class="small text-secondary">Editer</a>
-                                    <a href="{{ path('app_account_adress_delete', {id : adress.id}) }}" class="small text-secondary">Supprimer</a>
+                                    <a href="{{ path('app_account_adress_delete', {id: adress.id, '_token': csrf_token('delete_adress' ~ adress.id)}) }}" class="small text-secondary" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">Supprimer</a>
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?');">>Supprimer</a>
 
                                 </div>
                             </div>

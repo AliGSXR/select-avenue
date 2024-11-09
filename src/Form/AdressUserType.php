@@ -71,6 +71,9 @@ class AdressUserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Adress::class,
+            'csrf_protection' => true, // Active la protection CSRF
+            'csrf_field_name' => '_token', // Nom du champ CSRF
+            'csrf_token_id'   => 'adress_item', // Identifiant unique pour le token CSRF
         ]);
     }
 }

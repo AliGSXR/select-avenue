@@ -82,9 +82,13 @@ class RegisterUserType extends AbstractType
               new UniqueEntity([
                   'entityClass' => User::class,
                   'fields' => ['email'],
+                  'message' => 'Cette adresse e-mail est déja utilisée.'
               ])
             ],
             'data_class' => User::class,
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_token_id' => 'register_user_item',
         ]);
     }
 }

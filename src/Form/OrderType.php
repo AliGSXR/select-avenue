@@ -43,6 +43,9 @@ class OrderType extends AbstractType
     {
         $resolver->setDefaults([
             'adresses' => null,
+            'csrf_protection' => true, // Activation de la protection CSRF
+            'csrf_field_name' => '_token', // Nom du champ CSRF
+            'csrf_token_id'   => 'order_item', // Identifiant unique pour le token CSRF
         ]);
     }
 }

@@ -8,18 +8,23 @@ use App\Form\AdressUserType;
 use App\Repository\AdressRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 class AdressControler extends AbstractController
 {
-
     private $entityManager;
+    private $csrfTokenManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, CsrfTokenManagerInterface $csrfTokenManager)
     {
         $this->entityManager = $entityManager;
+        $this->csrfTokenManager = $csrfTokenManager;
     }
+
     #[Route('/compte/adresses', name: 'app_account_adresses')]
     public function index(): Response
     {
@@ -27,31 +32,37 @@ class AdressControler extends AbstractController
     }
 
     #[Route('/compte/adresses/delete/{id}', name: 'app_account_adress_delete')]
-    public function delete($id, AdressRepository $adressRepository): Response
+    public function delete($id, AdressRepository $adressRepository, Request $request): Response
     {
         $adress = $adressRepository->find($id);
-        if(!$adress OR $adress->getUser() !== $this->getUser()){
+
+        // Vérification que l'adresse appartient bien à l'utilisateur connecté
+        if (!$adress || $adress->getUser() !== $this->getUser()) {
             return $this->redirectToRoute('app_account_adresses');
         }
-        $this->addFlash(
-            'success',
-            "Votre adresse a bien été supprimée"
-        );
+
+        // Vérification du token CSRF
+        $submittedToken = $request->query->get('_token'); // Récupère le token CSRF de l'URL
+        if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('delete_adress' . $id, $submittedToken))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
+        $this->addFlash('success', "Votre adresse a bien été supprimée");
 
         $this->entityManager->remove($adress);
         $this->entityManager->flush();
-        return $this->render('account/index.html.twig');
+        return $this->redirectToRoute('app_account_adresses');
     }
 
-    #[Route('/compte/adresse/ajouter/{id}', name: 'app_account_adress_form', defaults: ['id'=>null])]
-    public function form(\Symfony\Component\HttpFoundation\Request $request,$id, AdressRepository $adressRepository, Cart $cart): Response
+    #[Route('/compte/adresse/ajouter/{id}', name: 'app_account_adress_form', defaults: ['id' => null])]
+    public function form(Request $request, $id, AdressRepository $adressRepository, Cart $cart): Response
     {
-        if($id){
-            $adress  = $adressRepository->find($id);
-            if(!$adress OR $adress->getUser() !== $this->getUser()){
+        if ($id) {
+            $adress = $adressRepository->find($id);
+            if (!$adress || $adress->getUser() !== $this->getUser()) {
                 return $this->redirectToRoute('app_account_adresses');
             }
-        }else{
+        } else {
             $adress = new Adress();
             $adress->setUser($this->getUser());
         }
@@ -63,12 +74,9 @@ class AdressControler extends AbstractController
             $this->entityManager->persist($adress);
             $this->entityManager->flush();
 
-            $this->addFlash(
-                'success',
-                "Votre adresse a bien été enregistrée"
-            );
+            $this->addFlash('success', "Votre adresse a bien été enregistrée");
 
-            if ($cart->fullQuantity() > 0){
+            if ($cart->fullQuantity() > 0) {
                 return $this->redirectToRoute('app_order');
             }
 
@@ -79,4 +87,3 @@ class AdressControler extends AbstractController
         ]);
     }
 }
-?>

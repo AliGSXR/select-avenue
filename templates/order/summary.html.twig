@@ -3,69 +3,67 @@
 
 {% block body %}
     <div class="container mt-5">
+        <h1 class="mb-4">Récapitulatif de ma commande</h1>
 
-        <h1>Récapitulatif de ma commande</h1>
+        <div class="row">
 
-        <div class="row my-5">
             <div class="col-md-8">
-
                 <strong>Contenu de mon panier</strong> <br>
                 {% for product in cart %}
-                    <div class="row mt-2">
+                    <div class="row align-items-center border-bottom py-3 mt-2">
                         <div class="col-md-2">
-                            <img src="/upload/{{ product.object.illustration }}" class="img-fluid" alt="{{ product.object.name }}">
+                            <img src="/upload/{{ product.object.illustration }}" class="img-fluid rounded shadow-sm" alt="{{ product.object.name }}">
                         </div>
                         <div class="col-md-6">
-                            <strong>{{ product.object.name }}</strong>
-                            <span class="d-block">Prix unitaire : {{ product.object.pricewt|price}} </span>
+                            <h5 class="mb-1">{{ product.object.name }}</h5>
+                            <span class="d-block text-muted">Prix unitaire : {{ product.object.pricewt|price }}</span>
                         </div>
-                        <div class="col-md-2 text-right">
+                        <div class="col-md-2 text-center">
                             <span class="badge text-bg-secondary">x{{ product.quantity }}</span>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-2 text-right">
                             <strong>{{ (product.quantity * product.object.pricewt)|price }}</strong>
                         </div>
                     </div>
-
                 {% endfor %}
-                <div class="bg-light p-3 my-3">
+
+                <div class="bg-light p-3 my-3 rounded">
                     <strong>Votre adresse de livraison : </strong> <br>
                     {{ choices.adresses.firstname }} {{ choices.adresses.lastname }} <br>
                     {{ choices.adresses.adress }} <br>
                     {{ choices.adresses.city }} - {{ choices.adresses.country }}
-
                 </div>
-                <hr>
-                <div class="bg-light p-3 " >
+
+                <div class="bg-light p-3 rounded">
                     <strong>Votre transporteur : </strong><br>
                     {{ choices.carriers.name }} <br>
                     {{ choices.carriers.description }}
                 </div>
-
-
             </div>
-            <div class="col-md-4">
-                <div class="bg-light p-3">
-                    <div class="d-flex justify-content-between">
-                        <span class="fw-bold">Total produits</span>
-                    </div>
 
-                    <div class="d-flex justify-content-between mt-3">
-                        <span class="fw-bold">Frais de livraison</span>
+
+            <div class="col-md-4">
+                <div class="bg-light p-4 rounded shadow-sm">
+                    <h5 class="fw-bold mb-3">Récapitulatif</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total produits</span>
+                        <span class="fw-bold">{{ fullCartQuantity }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Prix total</span>
+                        <span class="fw-bold">{{ totalWt|price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Frais de livraison</span>
                         <span>{{ choices.carriers.price|price }}</span>
                     </div>
-                    <div class="d-flex justify-content-between mt-3">
-                        <span class="fw-bold">Total commande</span>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total commande</span>
                         <span>{{ (totalWt + choices.carriers.price)|price }}</span>
                     </div>
-                    <div>
-                        <a href="{{ path('app_order') }}" class="btn btn-success w-100 mt-3">Commander</a>
-                    </div>
+                    <a href="{{ path('app_payment', {'id_order' : order.id}) }}" class="btn btn-success w-100 mt-3">Payer</a>
                 </div>
             </div>
-
         </div>
-
-
     </div>
 {% endblock %}

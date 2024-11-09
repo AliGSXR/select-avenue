@@ -85,7 +85,10 @@ class PasswordUserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'passwordHasher' => null
+            'passwordHasher' => null,
+            'csrf_protection' => true, // Activation de la protection CSRF
+            'csrf_field_name' => '_token', // Nom du champ CSRF
+            'csrf_token_id'   => 'password_user_item', // Identifiant unique pour le token CSRF
         ]);
     }
 }

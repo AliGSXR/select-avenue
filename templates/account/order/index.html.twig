@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <div class="container mt-5">
+
+        <h1>Espace membre</h1>
+
+        <div class="row">
+            <div class="col-md-3">
+                {% include 'account/_menu.html.twig' %}
+            </div>
+            <div class="col-md-9">
+                <style>
+                    /* Style de base pour une apparence propre et professionnelle */
+                    body {
+                        font-family: Arial, sans-serif;
+                        color: #333;
+                    }
+
+                    h3 {
+                        font-size: 1.5em;
+                        color: #0056b3;
+                        margin-bottom: 0.5em;
+                    }
+
+                    .order-info {
+                        font-size: 0.9em;
+                        color: #888;
+                    }
+
+                    .content-section {
+                        margin: 1em 0;
+                    }
+
+                    strong {
+                        color: #0056b3;
+                    }
+
+                    .table {
+                        width: 100%;
+                        margin-top: 1em;
+                        border-collapse: collapse;
+                    }
+
+                    .table th {
+                        background-color: #f8f9fa;
+                        text-align: left;
+                        padding: 0.75em;
+                        border-bottom: 2px solid #dee2e6;
+                    }
+
+                    .table td {
+                        padding: 0.75em;
+                        vertical-align: middle;
+                        border-bottom: 1px solid #dee2e6;
+                    }
+
+                    .table img {
+                        border-radius: 5px;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .row {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-top: 1em;
+                    }
+
+                    .col-md-6 {
+                        width: 48%;
+                        background-color: #f1f1f1;
+                        padding: 1em;
+                        border-radius: 5px;
+                    }
+
+                    .text-right {
+                        text-align: right;
+                        font-size: 1.25em;
+                        color: #333;
+                    }
+
+                    .fs-5 {
+                        font-weight: bold;
+                    }
+                </style>
+
+                <small><a href="{{ path('app_account') }}" class="btn btn-light">Retour</a></small>
+
+                <h3 class="mt-5">Commande N°{{ order.id }}</h3>
+
+
+                <div class="order-info">
+                    <span>Date : {{ order.createdAt|date('d/m/Y') }}</span><br>
+                </div>
+                <br>
+
+
+                {{ include('admin/etat.html.twig', { field : {'value' : order.state}}) }}
+                <hr>
+
+                <div class="row my-4">
+                    <div class="col-md-6">
+                        <strong>Adresse de livraison</strong><br>
+                        {{ order.delivery|raw }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Transporteur</strong><br>
+                        {{ order.carrierName }}
+                    </div>
+                </div>
+
+                <!-- Contenu de la commande -->
+                <div class="content-section">
+                    <strong>Contenu de la commande :</strong>
+                </div>
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Illustration</th>
+                        <th scope="col">Nom du produit</th>
+                        <th scope="col">Quantité</th>
+                        <th scope="col">Prix unitaire H.T</th>
+                        <th scope="col">TVA</th>
+                        <th scope="col">Total T.T.C</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in order.orderDetails %}
+                        <tr>
+                            <td><img src="upload/{{ product.productIllustration}}" width="155px" alt="Illustration produit"></td>
+                            <td>{{ product.productName }}</td>
+                            <td>{{ product.productQuantity }}</td>
+                            <td>{{ product.productPrice|price }}</td>
+                            <td>{{ product.productTva }} %</td>
+                            {% set coeff = 1 + (product.productTva /100) %}
+                            <td>{{ ((product.productPrice * coeff) * product.productQuantity)|price }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="4"></td>
+                        <td>Frais de livraion ({{ order.carrierName }})</td>
+                        <td>{{ order.carrierPrice|price }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Total T.T.C. de la commande -->
+                <div class="text-right fs-5">
+                    <strong>Total T.T.C :</strong> {{ order.totalWt|price }}
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+{% endblock %}
