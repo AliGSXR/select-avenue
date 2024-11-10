@@ -1,0 +1,50 @@
+{# templates/easy_admin/dashboard.html.twig #}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block main %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Tableau de bord d'administration</h1>
+
+            <!-- Bouton de retour à l'accueil -->
+            <a href="{{ path('home') }}" class="btn btn-primary">
+                Revenir à l'accueil
+            </a>
+        </div>
+
+        <p>Bienvenue dans le tableau de bord ! Utilisez les liens dans la barre de navigation pour accéder aux différentes sections administratives.</p>
+
+        <!-- Contenu du tableau de bord personnalisé -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Gestion des utilisateurs</h5>
+                        <p class="card-text">Accédez à la liste des utilisateurs et gérez leurs informations.</p>
+                        <a href="{{ path('admin_user_index') }}" class="btn btn-outline-primary">Gérer les utilisateurs</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Gestion des produits</h5>
+                        <p class="card-text">Ajoutez, modifiez ou supprimez des produits dans la boutique.</p>
+                        <a href="{{ path('admin_product_index') }}" class="btn btn-outline-primary">Gérer les produits</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Commandes</h5>
+                        <p class="card-text">Consultez et gérez les commandes des clients.</p>
+                        <a href="{{ path('admin_order_index') }}" class="btn btn-outline-primary">Voir les commandes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ parent() }}
+{% endblock %}

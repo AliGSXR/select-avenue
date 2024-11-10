@@ -40,9 +40,7 @@ class AdressControler extends AbstractController
         if (!$adress || $adress->getUser() !== $this->getUser()) {
             return $this->redirectToRoute('app_account_adresses');
         }
-
-        // Vérification du token CSRF
-        $submittedToken = $request->query->get('_token'); // Récupère le token CSRF de l'URL
+        $submittedToken = $request->query->get('_token');
         if (!$this->csrfTokenManager->isTokenValid(new CsrfToken('delete_adress' . $id, $submittedToken))) {
             throw $this->createAccessDeniedException('Token CSRF invalide.');
         }
